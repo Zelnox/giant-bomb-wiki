@@ -1,18 +1,22 @@
 services:
   db:
     image: mariadb:11
+    command: --skip-name-resolve=0
     env_file:
       - .env
     volumes:
       - db-data:/var/lib/mysql
-      - ./wiki_schema.sql:/docker-entrypoint-initdb.d/wiki_schema.sql:ro
     healthcheck:
       test: "mariadb -uroot -p$MARIADB_ROOT_PASSWORD $MARIADB_DATABASE -e 'SHOW DATABASES;'"
       interval: 5s
       retries: 5
 
   wiki:
-    build: .
+    build:
+      context: .
+      args:
+        INSTALL_API: "false"
+        INSTALL_GCSFUSE: "false"
     env_file:
       - .env
     depends_on:
@@ -25,12 +29,12 @@ services:
       - ./skins:/var/www/html/skins:cached
       #These lines cause these skins not to be mounted to volume
       - /var/www/html/skins/Vector
-
       - ./config:/config
       - ./data:/data/
       - wiki-data:/var/www/html/images
-      - ./entrypoint.sh:/entrypoint.sh:ro
-    entrypoint: ["/entrypoint.sh"]
+    environment:
+      - MV_ENV=dev
+    restart: unless-stopped
 
 volumes:
   db-data:

@@ -15,8 +15,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	exit;
 }
 
-
-
+$wikiEnv = getenv('MV_ENV') ?: ($_ENV['MV_ENV'] ?? 'dev');
 
 ## Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
@@ -63,6 +62,15 @@ $wgDBname = getenv("MARIADB_DATABASE");
 $wgDBuser = getenv("MARIADB_USER");
 $wgDBpassword = getenv("MARIADB_PASSWORD");
 
+## Database settings for gb_api_dump
+$wgExternalDataSources['gb_api_dump'] = [ 
+    'server' => 'db',
+    'type' => 'mysql',
+    'name' => getenv("MARIADB_API_DUMP_DATABASE"),
+    'user' => getenv("MARIADB_USER"),
+    'password' => getenv("MARIADB_PASSWORD")
+];
+
 # MySQL specific settings
 $wgDBprefix = "";
 $wgDBssl = false;
@@ -83,6 +91,16 @@ $wgMemCachedServers = [];
 $wgEnableUploads = true;
 $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = "/usr/bin/convert";
+
+if ($wikiEnv == 'prod') {
+    # Mounted gcs bucket for images
+    $wgUploadDirectory = '/var/www/html/images';
+    $wgUploadPath = $wgScriptPath.'/images';
+}
+
+# Allow external images
+$wgAddImgTagWhitelist = true;
+$wgAddImgTagWhitelistDomainsList = ['www.giantbomb.com'];
 
 # InstantCommons allows wiki to use images from https://commons.wikimedia.org
 $wgUseInstantCommons = false;
@@ -159,7 +177,24 @@ wfLoadExtension( 'WikiEditor' );
 # End of automatically generated settings.
 # Add more configuration options below.
 
+wfLoadExtension( 'AddImgTag' );
+wfLoadExtension( 'DisplayTitle' );
+wfLoadExtension( 'PageForms' );
+
 $wgPFEnableStringFunctions = true;
 $wgPopupsHideOptInOnPreferencesPage = true;
 $wgPopupsReferencePreviewsBetaFeature = false;
-#$wgShowExceptionDetails = true;
+
+# Turn on subpages
+$wgNamespacesWithSubpages[NS_MAIN] = true;
+$wgNamespacesWithSubpages[NS_TEMPLATE] = true;
+
+# Allows the use of DISPLAYTITLE magic keyword
+$wgAllowDisplayTitle = true;
+$wgRestrictDisplayTitle = false;
+
+# Remove before prod push
+$wgShowExceptionDetails = true;
+$wgDevelopmentWarnings = true;
+error_reporting( -1 );
+ini_set( 'display_errors', 1 );
