@@ -42,6 +42,16 @@ jobs:
           cache: "pnpm"
       - name: Install pnpm and dependencies
         run: pnpm install
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build the image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true # Load the image built so it won't get re-built with docker compose up
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - run: |
           docker compose up --build -d
           docker exec giant-bomb-wiki-wiki-1 /bin/bash /installwiki.sh
@@ -51,7 +61,7 @@ jobs:
         with:
           name: container-logs
           path: logs.txt
-      - run: docker ps
+      # - run: docker ps
       # - name: install the wiki, get container name and run installwiki.sh
       #   run
       # - name: Verify wiki is up
