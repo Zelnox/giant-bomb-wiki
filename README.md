@@ -4,15 +4,22 @@ We should add stuff here.
 
 ## Running the wiki for the first time
 
-- Have docker desktop installed and running
-- NOTE: If you are updating a previous install for the first time since getting the .env file, you will need to remove your volumes so everything is built using the new credentials.
-- Run `docker compose up -d` in the root of this repo.
-- It will take a few minutes to fully install and start the repo. You can watch the wiki container log once the containers have started to watch progress, or just wait a few minutes.
-- You should now be able to access the wiki at http://localhost:8080/.
-- The default admin username is giantbomb
-- The default admin password is gbwikipass
-- By default the vector skin is loaded. To load the giantbomb vue skin change see instuctions in the Skins section below.
-- You can visit http://localhost:8080/index.php/Special:Version to see the loaded features.
+1. Prepare the environment by first installing [Docker Desktop](https://www.docker.com/products/docker-desktop/) and running it.
+2. Configure the wiki by copying `.env.example` to `.env` and filling out the missing values accordingly.
+   - (optional) If you need services that will use the Giant Bomb legacy API, see the readme for [gb_api_scripts](gb_api_scripts/README.md).
+3. Start the wiki services from the terminal, with
+   - `docker compose up -d`
+   - This will download, install, and start the database and the mediawiki services.
+   - (optional) Run `docker compose build --no-cache` if you can see the version of mediawiki is not the expected one (currently Mediawiki 1.43.1).
+4. Install the wiki in two steps
+   1. Find the wiki container with `docker ps`. By default it should be `giant-bomb-wiki-wiki-1`
+   2. Install with
+      - `docker exec <wiki-container-name> /bin/bash /installwiki.sh`
+      - This is a one time action to configure Mediawiki and install the necessary Mediawiki extensions/skins as seen in `/config/LocalSettings.php`.
+      - It also performs some web-centric configurations.
+5. Verify the Special Version page http://localhost:8080/index.php/Special:Version loads in a browser and see the installed extensions/skins and their versions.
+6. (optional) To tear down everything and remove the Volumes, `docker compose down -v`
+7. (optional) Execute all end-to-end tests with `pnpm test`. See the [Tests](#Tests) section for the set-up.
 
 ## Skins
 
@@ -78,6 +85,46 @@ We should add stuff here.
   |?Has Release=Release Date
   }}
   ```
+
+## [Tests](#Tests)
+
+### [Package Manager](#Package-Manager)
+
+The package manager chosen is [pnpm](https://pnpm.io) for its speed.
+
+With `pnpm` ready, install the configured packages with
+
+```sh
+pnpm install
+```
+
+This will install packages defined in the [pnpm workspace config file](pnpm-workspace.yaml).
+
+### E2E Testing
+
+The end-to-end tests use the [Cypress](https://www.cypress.io) framework.
+
+After setting up the [package manager](#Package-Manager), execute the `cypress` tests in headless mode with
+
+```sh
+pnpm cypess run
+```
+
+The tests should run within the terminal and end with the test results.
+
+To open the cypress UI, run
+
+```sh
+pnpm cypress open
+```
+
+### Continuous Integration
+
+A Github Action workflow will be added to execute a subset of the `cypress` tests as part of the pull request pipeline.
+
+### Git Pre-commit Hook
+
+A git commit will use [Husky](https://typicode.github.io/husky/) to execute hooks listed in [.husky](.husky). To skip them (if necessary), add the option `--no-verify` or `-n`.
 
 ## TODO's
 
