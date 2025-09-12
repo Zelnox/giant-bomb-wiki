@@ -1,0 +1,16 @@
+{
+  "devDependencies": {
+    "@types/bun": "latest",
+    "cypress": "^15.2.0",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "format": "bun prettier --write --config .prettierrc 'README.md|(skins|cypress|.github)/**/*.{js,json,ts,yaml}|*.json|*.yaml'",
+    "format:check": "bun prettier --check --config .prettierrc 'README.md|(skins|cypress|.github)/**/*.{js,json,ts,yaml}|*.json|*.yaml'",
+    "test:e2e": "bun cypress run"
+  },
+  "type": "module",
+  "private": true
+}
