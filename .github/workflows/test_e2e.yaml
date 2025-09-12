@@ -22,6 +22,11 @@ jobs:
           echo "MW_PASS=gbwikipass.ci" >> .env
       - name: Set up Docker Compose
         uses: docker/setup-compose-action@v1
+      # - uses: oven-sh/setup-bun@v2
+      #   with:
+      #     bun-version-file: ".bun-version"
+      # - name: Install dependencies
+      #   run: bun install
       - name: Install pnpm explicitly
         uses: pnpm/action-setup@v4
         with:
@@ -53,6 +58,8 @@ jobs:
         with:
           name: container-logs
           path: logs.txt
+      # - name: Install cypress manually
+      #   run: bun cypress install
       - name: Run E2E tests
         uses: cypress-io/github-action@v6
         with:
