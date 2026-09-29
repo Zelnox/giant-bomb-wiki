@@ -25,7 +25,7 @@ jobs:
       - name: Install pnpm explicitly
         uses: pnpm/action-setup@v6
         with:
-          version: 10 # must be 10?
+          version: 10 # current cypress must use 10
       - name: Install Node.js to use the cache
         uses: actions/setup-node@v6
         with:
