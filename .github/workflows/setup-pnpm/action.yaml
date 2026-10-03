@@ -1,0 +1,16 @@
+name: Re-usable pnpm setup and install
+on:
+  workflow_call:
+    # inputs:
+    #   config-path:
+    #     required: true
+    #     type: string
+
+jobs:
+  pnpm-setup-install:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: pnpm/setup@v3
+        with:
+          version: latest-12
+          cache: true

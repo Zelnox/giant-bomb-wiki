@@ -1,8 +1,8 @@
 name: Test Mediawiki Version Page End-to-End
 on: [workflow_dispatch, pull_request]
 jobs:
-  cypress-run:
-    runs-on: ubuntu-24.04
+  prepare-image:
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7
@@ -22,10 +22,52 @@ jobs:
           echo "MW_PASS=gbwikipass.ci" >> .env
       - name: Set up Docker Compose
         uses: docker/setup-compose-action@v2
-      - uses: pnpm/setup@v3
-        with:
-          version: latest-12
-          cache: true
+      - name: hi
+        uses: $/.github/workflows/setup-pnpm/action.yaml
+      # # - uses: pnpm/setup@v3
+      # #   with:
+      # #     version: latest-12
+      # #     cache: true
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v4
+      # - name: Build the image
+      #   uses: docker/build-push-action@v7
+      #   with:
+      #     context: .
+      #     push: false
+      #     load: true # Load the image just built so it won't get re-built with docker compose up
+      #     cache-from: type=gha # github action cache
+      #     cache-to: type=gha,mode=max
+
+  # pnpm-stuff:
+  #   uses: $/.github/workflows/setup_pnpm.yml
+
+  cypress-run:
+    needs: prepare-image
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+      - name: Create the .env file the installation will require
+        run: |
+          echo "MARIADB_DATABASE: gb_wiki_ci" >> .env
+          echo "MARIADB_API_DUMP_DATABASE=gb_api_dump" >> .env
+          echo "MARIADB_USER=wiki_admin_ci" >> .env
+          echo "MARIADB_PASSWORD=test.password.ci" >> .env
+          echo "MARIADB_ROOT_PASSWORD: gb_root_ci" >> .env
+          echo "MW_SITE_SERVER=http://localhost:8080" >> .env
+          echo "MW_SCRIPT_PATH=\"\"" >> .env
+          echo "MW_SITE_NAME=\"Giant Bomb Wiki\"" >> .env
+          echo "MW_DB_HOST=db" >> .env
+          echo "MW_DB_NAME=gb_wiki_ci" >> .env
+          echo "MW_DB_USER=giantbomb.ci" >> .env
+          echo "MW_PASS=gbwikipass.ci" >> .env
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v2
+      # - uses: pnpm/setup@v3
+      #   with:
+      #     version: latest-12
+      #     cache: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Build the image
@@ -40,6 +82,8 @@ jobs:
         run: |
           docker compose up --build -d
           docker exec giant-bomb-wiki-wiki-1 /bin/bash /installwiki.sh
+      - name: get logs
+        run: |
           docker compose logs --tail=50 > logs.txt
       - name: Upload docker logs
         uses: actions/upload-artifact@v6
