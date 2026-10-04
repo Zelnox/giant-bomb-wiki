@@ -1,0 +1,15 @@
+name: Re-usable pnpm setup and install
+on:
+  workflow_call:
+
+runs:
+  using: "composite"
+  # runs-on: ubuntu-26.04
+  steps:
+    - uses: pnpm/setup@v3
+      with:
+        version: latest-12
+        cache: true
+    - name: test
+      shell: bash
+      run: pnpm --version

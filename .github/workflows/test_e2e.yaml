@@ -23,7 +23,14 @@ jobs:
       - name: Set up Docker Compose
         uses: docker/setup-compose-action@v2
       - name: hi
-        uses: $/.github/workflows/setup-pnpm/action.yaml
+        run: |
+          echo "hi"
+          echo "`pwd`"
+          echo "`ls -lah .github/actions/setup-pnpm`"
+          echo ${{ github.workspace }}
+          echo $GITHUB_WORKSPACE
+      - name: hi2
+        uses: ./.github/actions/setup-pnpm/
       # # - uses: pnpm/setup@v3
       # #   with:
       # #     version: latest-12
@@ -46,28 +53,41 @@ jobs:
     needs: prepare-image
     runs-on: ubuntu-26.04
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v7
-      - name: Create the .env file the installation will require
-        run: |
-          echo "MARIADB_DATABASE: gb_wiki_ci" >> .env
-          echo "MARIADB_API_DUMP_DATABASE=gb_api_dump" >> .env
-          echo "MARIADB_USER=wiki_admin_ci" >> .env
-          echo "MARIADB_PASSWORD=test.password.ci" >> .env
-          echo "MARIADB_ROOT_PASSWORD: gb_root_ci" >> .env
-          echo "MW_SITE_SERVER=http://localhost:8080" >> .env
-          echo "MW_SCRIPT_PATH=\"\"" >> .env
-          echo "MW_SITE_NAME=\"Giant Bomb Wiki\"" >> .env
-          echo "MW_DB_HOST=db" >> .env
-          echo "MW_DB_NAME=gb_wiki_ci" >> .env
-          echo "MW_DB_USER=giantbomb.ci" >> .env
-          echo "MW_PASS=gbwikipass.ci" >> .env
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v2
+      # - name: Checkout repo
+      #   uses: actions/checkout@v7
+      # - name: Create the .env file the installation will require
+      #   run: |
+      #     echo "MARIADB_DATABASE: gb_wiki_ci" >> .env
+      #     echo "MARIADB_API_DUMP_DATABASE=gb_api_dump" >> .env
+      #     echo "MARIADB_USER=wiki_admin_ci" >> .env
+      #     echo "MARIADB_PASSWORD=test.password.ci" >> .env
+      #     echo "MARIADB_ROOT_PASSWORD: gb_root_ci" >> .env
+      #     echo "MW_SITE_SERVER=http://localhost:8080" >> .env
+      #     echo "MW_SCRIPT_PATH=\"\"" >> .env
+      #     echo "MW_SITE_NAME=\"Giant Bomb Wiki\"" >> .env
+      #     echo "MW_DB_HOST=db" >> .env
+      #     echo "MW_DB_NAME=gb_wiki_ci" >> .env
+      #     echo "MW_DB_USER=giantbomb.ci" >> .env
+      #     echo "MW_PASS=gbwikipass.ci" >> .env
+      # - name: Set up Docker Compose
+      #   uses: docker/setup-compose-action@v2
+      # # - uses: pnpm/setup@v3
+      # #   with:
+      # #     version: latest-12
+      # #     cache: true
+      #
       # - uses: pnpm/setup@v3
       #   with:
       #     version: latest-12
-      #     cache: true
+      - name: test if pnpm from prepare image can be used
+        run: |
+          echo "test here"
+          echo ${{ github.workspace }}
+          echo ENV
+          echo "`pwd`"
+          echo "`ls -lah /home/runner/`"
+          echo "-_-"
+          echo "`ls -lah /home/runner/actions-runner`"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Build the image
