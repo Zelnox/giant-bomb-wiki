@@ -1,6 +1,7 @@
 allowBuilds:
+  "@parcel/watcher": true
   cypress: true
-  unrs-resolver: false
+  unrs-resolver: true
 
 # disable pnpm side effects cache to allow cypress to run its postinstall script
 # so it can install into its binary cache
