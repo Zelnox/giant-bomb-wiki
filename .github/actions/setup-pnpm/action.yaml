@@ -1,4 +1,4 @@
-name: Re-usable pnpm setup and install
+name: pnpm setup and install action
 on:
   workflow_call:
 

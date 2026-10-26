@@ -2,15 +2,26 @@ name: Re-usable pnpm setup and install
 on:
   workflow_call:
     # inputs:
-    #   config-path:
+    #   config-path: # see pnpm/setup `cache-dependency-path`, need pnpm.lock location
     #     required: true
     #     type: string
 
 jobs:
-  pnpm-setup-install:
+  reusable-workflow-pnpm:
     runs-on: ubuntu-26.04
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+      - name: hi
+        run: |
+          echo "inside reusable workflow"
+          echo "\${{ github.workspace}}: ${{ github.workspace }}"
+          echo "\$GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "`ls ~`"
+          echo "--"
+          echo "`ls $GITHUB_WORKSPACE`"
       - uses: pnpm/setup@v3
         with:
           version: latest-12
           cache: true
+          cache-dependency-path: ${{ github.workspace }}
