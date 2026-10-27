@@ -10,4 +10,5 @@ export default defineConfig({
     baseUrl: "http://localhost:8080/index.php",
   },
   defaultCommandTimeout: 10000,
+  defaultBrowser: "chrome",
 });
